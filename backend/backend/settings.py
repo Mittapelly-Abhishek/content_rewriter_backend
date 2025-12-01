@@ -86,6 +86,8 @@ TEMPLATES = [
     },
 ]
 
+GROQ_API_KEY= env("OPENAI_API_KEY")
+
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 # ---------------------------------------------------

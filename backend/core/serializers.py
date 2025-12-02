@@ -25,7 +25,13 @@ class RegisterSerializer(serializers.ModelSerializer):
 # -------------------------
 # Rewrite History Serializer
 # -------------------------
+from rest_framework import serializers
+from .models import RewriteHistory
+from django.contrib.auth.models import User
+
+
 class RewriteHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = RewriteHistory
-        fields = "__all__"
+        fields = ["id", "user", "original_text", "rewritten_text", "tone", "language", "created_at"]
+        read_only_fields = ["id", "created_at", "user"]

@@ -14,6 +14,9 @@ from .serializers import RewriteHistorySerializer, RegisterSerializer
 from .utils import rewrite_content
 from .exports import generate_pdf
 
+from .utils import rewrite_content, speech_to_text
+
+
 
 # -------------------------------
 # Register User
@@ -43,18 +46,20 @@ def register_view(request):
 # -------------------------------
 # AI Rewrite Content
 # -------------------------------
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def rewrite_view(request):
     text = request.data.get("text")
     tone = request.data.get("tone", "formal")
+    language = request.data.get("language", "english")  # 👈 NEW
 
     if not text:
         return Response({"error": "Text is required"}, status=400)
 
-    rewritten = rewrite_content(text, tone)
+    rewritten = rewrite_content(text, tone, language)
 
-    return Response({"rewritten_text": rewritten})
+    return Response({"rewritten_text": rewritten, "language": language})
 
 
 # -------------------------------
@@ -65,6 +70,10 @@ def rewrite_view(request):
 def save_history_view(request):
     data = request.data.copy()
     data["user"] = request.user.id
+
+    # if language not sent from frontend, default english
+    if "language" not in data:
+        data["language"] = "english"
 
     serializer = RewriteHistorySerializer(data=data)
     if serializer.is_valid():
@@ -115,3 +124,42 @@ def export_pdf_view(request, pk):
     response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="rewrite_{pk}.pdf"'
     return response
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def voice_view(request):
+    text = request.data.get("text")
+
+    if not text:
+        return Response({"error": "Text is required"}, status=400)
+
+    from .voice import text_to_speech
+    audio_file = text_to_speech(text)
+
+    response = HttpResponse(audio_file.read(), content_type="audio/mpeg")
+    response["Content-Disposition"] = 'attachment; filename="speech.mp3"'
+    return response
+
+
+
+    
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def speech_to_text_view(request):
+    audio = request.FILES.get("audio")
+    language = request.data.get("language", "english")
+
+    if not audio:
+        return Response({"error": "audio file is required (field name: audio)"}, status=400)
+
+    try:
+        text = speech_to_text(audio, language)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+    return Response({"text": text, "language": language})
+
+
+
+
+

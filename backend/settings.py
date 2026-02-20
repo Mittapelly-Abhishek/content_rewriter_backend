@@ -17,6 +17,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
+
+# ---------------------------------------------------
+# API KEYS
+# ---------------------------------------------------
+GROQ_API_KEYS = env("GROQ_API_KEY").split(",")
+OPENROUTER_API_KEYS = env("OPENROUTER_API_KEY").split(",")
+
+
+
 # ---------------------------------------------------
 # SECURITY SETTINGS
 # ---------------------------------------------------
@@ -42,6 +51,7 @@ INSTALLED_APPS = [
 
     # Local apps
     'core',
+    'drf_yasg',
 ]
 
 REST_FRAMEWORK = {
@@ -86,7 +96,8 @@ TEMPLATES = [
     },
 ]
 
-GROQ_API_KEY= env("OPENAI_API_KEY")
+
+
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 

@@ -99,35 +99,3 @@ def rewrite_content(text, tone="formal", language="english"):
     except:
         return "All AI services are busy. Try again later."
 
-
-# ------------------------------------------------
-# SPEECH → TEXT + TRANSLATION
-# ------------------------------------------------
-def speech_to_text(audio_file, target_language="english"):
-
-    target_language = (target_language or "english").lower().strip()
-
-    audio_bytes = audio_file.read()
-
-    transcription = Groq(api_key=next(groq_keys_cycle)).audio.transcriptions.create(
-        model="whisper-large-v3",
-        file=("audio.mp3", audio_bytes),
-    )
-
-    original_text = transcription.text
-
-    if target_language in ["original", "same", "auto", "none"]:
-        return original_text
-
-    prompt = f"Translate the following text to {target_language}:\n\n{original_text}"
-
-    translation = Groq(api_key=next(groq_keys_cycle)).chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[
-            {"role": "system", "content": "You are a professional translator."},
-            {"role": "user", "content": prompt},
-        ],
-        temperature=0.3,
-    )
-
-    return translation.choices[0].message.content

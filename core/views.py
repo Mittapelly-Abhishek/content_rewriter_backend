@@ -88,7 +88,7 @@ def login_view(request):
         }
     }, status=status.HTTP_200_OK)
 
-    # 🍪 Set cookies
+    #  Set cookies
     response.set_cookie(
         key="access_token",
         value=access_token,
@@ -230,34 +230,3 @@ def export_pdf_view(request, pk):
     response["Content-Disposition"] = f'attachment; filename="rewrite_{pk}.pdf"'
     return response
 
-
-
-# -------------------------------
-# SPEECH → TEXT
-# -------------------------------
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def speech_to_text_view(request):
-    audio = request.FILES.get("audio")
-    language = request.data.get("language", "english")
-
-    if not audio:
-        return Response({
-            "status": "error",
-            "message": "Audio file is required"
-        }, status=400)
-
-    try:
-        text = speech_to_text(audio, language)
-
-        return Response({
-            "status": "success",
-            "text": text,
-            "language": language
-        })
-
-    except Exception as e:
-        return Response({
-            "status": "error",
-            "message": str(e)
-        }, status=500)

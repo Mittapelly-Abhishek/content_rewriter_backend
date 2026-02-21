@@ -11,6 +11,5 @@ urlpatterns = [
     path("history/save/", views.save_history_view),
     path("history/<int:pk>/", views.delete_history_view),
     path("export/pdf/<int:pk>/", views.export_pdf_view),
-    path("speech-to-text/", views.speech_to_text_view),
 ]
 

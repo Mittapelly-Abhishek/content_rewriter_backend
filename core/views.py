@@ -13,7 +13,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import RewriteHistory
 from .serializers import RewriteHistorySerializer, RegisterSerializer
-from .utils import rewrite_content, speech_to_text
+from .utils import rewrite_content
 from .exports import generate_pdf
 
 
